@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: eduai
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
