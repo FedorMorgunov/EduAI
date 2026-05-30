@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduAI — Презентация защиты</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d2e;
+    --accent: #6c63ff;
+    --accent2: #00d2ff;
+    --text: #e8eaf6;
+    --muted: #9395a5;
+    --green: #4caf50;
+    --card: #23263a;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Navigation ─────────────────────────────────────────── */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px;
+    background: var(--surface);
+    border-bottom: 1px solid #2a2d42;
+    flex-shrink: 0;
+  }
+  nav .logo { font-weight: 700; font-size: 1.1rem; color: var(--accent2); }
+  nav .controls { display: flex; gap: 12px; align-items: center; }
+  nav button {
+    background: var(--card);
+    border: 1px solid #3a3d54;
+    color: var(--text);
+    padding: 6px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+  }
+  nav button:hover { background: var(--accent); }
+  nav .counter { color: var(--muted); font-size: 0.9rem; min-width: 60px; text-align: center; }
+
+  /* ── Slides container ─────────────────────────────────────── */
+  .deck { flex: 1; position: relative; overflow: hidden; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 48px 80px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .slide.active { opacity: 1; pointer-events: all; }
+
+  /* ── Shared typography ────────────────────────────────────── */
+  h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; }
+  h2 { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; margin-bottom: 28px; }
+  h2 .accent { color: var(--accent2); }
+  p, li { font-size: clamp(0.9rem, 1.6vw, 1.1rem); line-height: 1.7; color: var(--muted); }
+  ul { list-style: none; }
+  ul li::before { content: '▸ '; color: var(--accent); }
+
+  .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ── Slide 1 — Title ─────────────────────────────────────── */
+  #s1 { background: radial-gradient(ellipse at 60% 40%, #1f1060 0%, var(--bg) 70%); text-align: center; }
+  #s1 h1 { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  #s1 .subtitle { font-size: clamp(1rem, 2vw, 1.35rem); color: var(--muted); margin-top: 16px; }
+  #s1 .meta { margin-top: 48px; color: #555870; font-size: 0.9rem; }
+
+  /* ── Slide 2 — Problem / Solution ───────────────────────── */
+  #s2 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 900px; }
+  .card {
+    background: var(--card);
+    border: 1px solid #2e3150;
+    border-radius: 14px;
+    padding: 28px 32px;
+  }
+  .card h3 { font-size: 1.1rem; margin-bottom: 14px; }
+  .card.problem h3 { color: #ff6b6b; }
+  .card.solution h3 { color: var(--green); }
+
+  /* ── Slide 3 — Architecture ──────────────────────────────── */
+  #s3 .arch {
+    display: flex; align-items: center; gap: 0;
+    background: var(--card);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #2e3150;
+    margin-top: 8px;
+    width: 100%; max-width: 860px;
+  }
+  .arch-box {
+    flex: 1; padding: 22px 20px; text-align: center;
+    border-right: 1px solid #2e3150;
+  }
+  .arch-box:last-child { border-right: none; }
+  .arch-box .icon { font-size: 2rem; margin-bottom: 8px; }
+  .arch-box .label { font-size: 0.8rem; color: var(--muted); }
+  .arch-box .name { font-size: 1rem; font-weight: 700; margin-top: 4px; }
+  .arrow { font-size: 1.5rem; color: var(--accent); flex-shrink: 0; padding: 0 6px; }
+
+  /* ── Slide 4 — Demo / Endpoints ─────────────────────────── */
+  #s4 .endpoints { width: 100%; max-width: 820px; }
+  .ep-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 20px;
+    border-bottom: 1px solid #2a2d42;
+  }
+  .ep-row:last-child { border-bottom: none; }
+  .method {
+    font-family: monospace; font-size: 0.82rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 4px; min-width: 62px; text-align: center;
+  }
+  .GET  { background: #1b4332; color: #40d176; }
+  .POST { background: #1a2e5a; color: #6ca6f7; }
+  .PATCH{ background: #3b2600; color: #f7a03a; }
+  .DEL  { background: #3b1515; color: #f76060; }
+  .ep-path { font-family: monospace; font-size: 0.95rem; color: var(--text); }
+  .ep-desc { color: var(--muted); font-size: 0.88rem; margin-left: auto; }
+
+  /* ── Slide 5 — Tests & Quality ───────────────────────────── */
+  #s5 .stats { display: flex; gap: 24px; margin-bottom: 32px; }
+  .stat-card {
+    flex: 1; background: var(--card); border-radius: 14px;
+    padding: 24px; text-align: center;
+    border: 1px solid #2e3150;
+  }
+  .stat-card .num { font-size: 2.6rem; font-weight: 800; color: var(--accent2); }
+  .stat-card .lbl { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+
+  /* ── Slide 6 — CI/CD ─────────────────────────────────────── */
+  #s6 .pipeline {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; max-width: 840px;
+  }
+  .pipe-step {
+    flex: 1; background: var(--card); border-radius: 12px;
+    padding: 20px 16px; text-align: center;
+    border: 1px solid #2e3150;
+  }
+  .pipe-step .icon { font-size: 1.6rem; }
+  .pipe-step .name { font-size: 0.95rem; font-weight: 700; margin: 8px 0 4px; }
+  .pipe-step .sub { font-size: 0.78rem; color: var(--muted); }
+  .pipe-arrow { color: var(--accent); font-size: 1.4rem; flex-shrink: 0; }
+  #s6 .trigger { margin-top: 24px; color: var(--muted); font-size: 0.9rem; }
+  #s6 .trigger span { color: var(--accent2); font-family: monospace; }
+
+  /* ── Slide 7 — Links & Next Steps ───────────────────────── */
+  #s7 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; width: 100%; max-width: 900px; }
+  #s7 a { color: var(--accent2); text-decoration: none; font-family: monospace; font-size: 0.92rem; }
+  #s7 a:hover { text-decoration: underline; }
+  #s7 .next li { color: var(--muted); }
+  #s7 .next li::before { color: var(--green); }
+
+  /* ── Slide number indicator dots ────────────────────────── */
+  .dots { display: flex; gap: 8px; justify-content: center; padding: 12px; flex-shrink: 0; }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #2e3150; cursor: pointer; transition: background 0.2s;
+  }
+  .dot.active { background: var(--accent2); }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">EduAI</span>
+  <div class="controls">
+    <button onclick="go(-1)">&#8592; Назад</button>
+    <span class="counter" id="counter">1 / 7</span>
+    <button onclick="go(1)">Вперёд &#8594;</button>
+  </div>
+</nav>
+
+<div class="deck">
+
+  <!-- ── Slide 1 ── -->
+  <section class="slide active" id="s1">
+    <span class="badge">Курсовой проект</span>
+    <h1>EduAI</h1>
+    <p class="subtitle">AI-powered платформа для адаптивного обучения<br>Уроки · Квизы · REST API</p>
+    <div class="meta">
+      Фёдор Моргунов &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; v0.1.0
+    </div>
+  </section>
+
+  <!-- ── Slide 2 ── -->
+  <section class="slide" id="s2">
+    <h2>Проблема и <span class="accent">решение</span></h2>
+    <div class="cols">
+      <div class="card problem">
+        <h3>❌ Проблема</h3>
+        <ul>
+          <li>Статичные учебные материалы не адаптируются под уровень студента</li>
+          <li>Нет быстрого способа генерировать квизы по теме</li>
+          <li>Контент разрознен — нет единого API для интеграции</li>
+        </ul>
+      </div>
+      <div class="card solution">
+        <h3>✅ Решение</h3>
+        <ul>
+          <li>Единый REST API для уроков и квизов с фильтрацией по теме и сложности</li>
+          <li>Готов к подключению AI-генерации контента (Claude API)</li>
+          <li>Чистая архитектура — сервисный слой легко расширяется</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Slide 3 ── -->
+  <section class="slide" id="s3">
+    <h2>Архитектура <span class="accent">системы</span></h2>
+    <div class="arch">
+      <div class="arch-box">
+        <div class="icon">🌐</div>
+        <div class="name">Client</div>
+        <div class="label">Browser / curl / mobile</div>
+      </div>
+      <div class="arch-box" style="background:#1a1d30">
+        <div class="icon">⚡</div>
+        <div class="name">FastAPI</div>
+        <div class="label">Routes · Pydantic validation</div>
+      </div>
+      <div class="arch-box">
+        <div class="icon">🧠</div>
+        <div class="name">Services</div>
+        <div class="label">Business logic layer</div>
+      </div>
+      <div class="arch-box" style="background:#1a1d30">
+        <div class="icon">🗄️</div>
+        <div class="name">Store</div>
+        <div class="label">In-memory → DB-ready</div>
+      </div>
+    </div>
+    <ul style="margin-top:28px; max-width: 700px">
+      <li>Python 3.11 · FastAPI 0.111 · Pydantic v2 · uvicorn</li>
+      <li>Stateless сервис — горизонтально масштабируется</li>
+      <li>Сервисный слой изолирован — замена хранилища без изменения роутов</li>
+    </ul>
+  </section>
+
+  <!-- ── Slide 4 ── -->
+  <section class="slide" id="s4">
+    <h2>Демо — <span class="accent">API эндпоинты</span></h2>
+    <div class="endpoints card" style="padding:0">
+      <div class="ep-row"><span class="method GET">GET</span><span class="ep-path">/health</span><span class="ep-desc">Статус сервиса</span></div>
+      <div class="ep-row"><span class="method GET">GET</span><span class="ep-path">/lessons/?topic=Python</span><span class="ep-desc">Список уроков с фильтром</span></div>
+      <div class="ep-row"><span class="method POST">POST</span><span class="ep-path">/lessons/</span><span class="ep-desc">Создать урок</span></div>
+      <div class="ep-row"><span class="method PATCH">PATCH</span><span class="ep-path">/lessons/{id}</span><span class="ep-desc">Обновить урок</span></div>
+      <div class="ep-row"><span class="method DEL">DELETE</span><span class="ep-path">/lessons/{id}</span><span class="ep-desc">Удалить урок</span></div>
+      <div class="ep-row"><span class="method GET">GET</span><span class="ep-path">/quizzes/?difficulty=3</span><span class="ep-desc">Квизы по сложности</span></div>
+      <div class="ep-row"><span class="method POST">POST</span><span class="ep-path">/quizzes/</span><span class="ep-desc">Создать квиз с вопросами</span></div>
+    </div>
+    <p style="margin-top:16px">Интерактивная документация: <code style="color:var(--accent2)">http://localhost:8000/docs</code></p>
+  </section>
+
+  <!-- ── Slide 5 ── -->
+  <section class="slide" id="s5">
+    <h2>Тестирование и <span class="accent">качество кода</span></h2>
+    <div class="stats">
+      <div class="stat-card">
+        <div class="num">33</div>
+        <div class="lbl">Автотестов<br>(pytest)</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">0</div>
+        <div class="lbl">Нарушений<br>flake8</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">5</div>
+        <div class="lbl">Сценариев<br>ручного тест.</div>
+      </div>
+      <div class="stat-card" style="border-color:#4caf5044">
+        <div class="num" style="color:#4caf50">✓</div>
+        <div class="lbl">Всё зелёное</div>
+      </div>
+    </div>
+    <ul style="max-width:640px">
+      <li><strong>test_health.py</strong> — unit-тесты эндпоинта /health</li>
+      <li><strong>test_lessons.py</strong> — интеграционные тесты CRUD уроков</li>
+      <li><strong>test_quizzes.py</strong> — интеграционные тесты CRUD квизов</li>
+      <li><strong>test_services.py</strong> — unit-тесты сервисного слоя</li>
+    </ul>
+  </section>
+
+  <!-- ── Slide 6 ── -->
+  <section class="slide" id="s6">
+    <h2>CI/CD <span class="accent">пайплайн</span></h2>
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="icon">📤</div>
+        <div class="name">Push / PR</div>
+        <div class="sub">Триггер GitHub Actions</div>
+      </div>
+      <div class="pipe-arrow">▶</div>
+      <div class="pipe-step">
+        <div class="icon">🔍</div>
+        <div class="name">flake8</div>
+        <div class="sub">Статический анализ</div>
+      </div>
+      <div class="pipe-arrow">▶</div>
+      <div class="pipe-step">
+        <div class="icon">🧪</div>
+        <div class="name">pytest</div>
+        <div class="sub">33 автотеста</div>
+      </div>
+      <div class="pipe-arrow">▶</div>
+      <div class="pipe-step" style="border-color:#4caf5044">
+        <div class="icon">🚀</div>
+        <div class="name">Release</div>
+        <div class="sub">GitHub Release на тег v*</div>
+      </div>
+    </div>
+    <p class="trigger">Релиз публикуется автоматически при <span>git push origin v0.1.0</span></p>
+    <ul style="margin-top:20px; max-width:640px">
+      <li>Workflow: <code style="color:var(--accent2)">.github/workflows/ci.yml</code></li>
+      <li>Lint-джоба блокирует merge при ошибках стиля</li>
+      <li>Test-джоба запускается только после успешного lint</li>
+    </ul>
+  </section>
+
+  <!-- ── Slide 7 ── -->
+  <section class="slide" id="s7">
+    <h2>Ссылки и <span class="accent">дальнейшие шаги</span></h2>
+    <div class="two-col">
+      <div class="card">
+        <h3 style="color:var(--accent2);margin-bottom:14px">🔗 Ссылки</h3>
+        <ul style="line-height:2">
+          <li><a href="https://github.com/FedorMorgunov/EduAI">GitHub: FedorMorgunov/EduAI</a></li>
+          <li><a href="https://github.com/FedorMorgunov/EduAI/pull/1">Pull Request #1</a></li>
+          <li><a href="https://github.com/FedorMorgunov/EduAI/blob/claude/happy-cray-YzEdo/docs/deployment-guide.md">Deployment Guide</a></li>
+          <li><a href="https://github.com/FedorMorgunov/EduAI/blob/claude/happy-cray-YzEdo/CHANGELOG.md">CHANGELOG v0.1.0</a></li>
+        </ul>
+        <div style="margin-top:20px">
+          <p style="font-size:0.85rem;color:var(--muted)">Запуск за 1 шаг:</p>
+          <code style="color:var(--green);font-size:0.9rem">docker compose up --build</code>
+        </div>
+      </div>
+      <div class="card next">
+        <h3 style="color:var(--green);margin-bottom:14px">🗺️ Следующие шаги</h3>
+        <ul>
+          <li>Подключить PostgreSQL (заменить in-memory store)</li>
+          <li>Интегрировать Claude API для AI-генерации квизов</li>
+          <li>Добавить JWT-аутентификацию</li>
+          <li>Настроить деплой на Render / Railway</li>
+          <li>Покрытие тестами ≥ 90% (pytest-cov)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /deck -->
+
+<div class="dots" id="dots"></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+  let cur = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => show(i);
+    dotsEl.appendChild(d);
+  });
+
+  function show(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counter.textContent = `${cur + 1} / ${slides.length}`;
+  }
+
+  function go(dir) { show(cur + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') go(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    go(-1);
+  });
+</script>
+</body>
+</html>
